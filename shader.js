@@ -2,6 +2,7 @@ const canvas = document.getElementById('glCanvas');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
 // Vertex shader
 const vsSource = `
     attribute vec4 aVertexPosition;
@@ -10,40 +11,81 @@ const vsSource = `
     }
 `;
 
+// Fragment shader for mobile
+const fsSourceMobile = `
 
-const fsSource = `
-    precision lowp float;
-    uniform vec2 iResolution;
-    uniform float iTime;
+precision lowp float;
+uniform vec2 iResolution;
+uniform float iTime;
 
-    void main() {
-        vec2 fragCoord = gl_FragCoord.xy;
-        vec4 fragColor;
+void main() {
+    vec2 fragCoord = gl_FragCoord.xy;
+    vec4 fragColor;
 
-        float s = 0.0, v = 0.0;
-        vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.;
-        float time = (iTime-2.0)*58.0;
-        vec3 col = vec3(0);
-        vec3 init = vec3(tan(time * .0032)*.3, .35 - tan(time * .005)*.3, time * 0.0002);
-        for (int r = 0; r < 50; r++) 
-        {
-            vec3 p = init + s * vec3(uv, 0.05);
-            p.z = fract(p.z);
-            for (int i=0; i < 10; i++) p = abs(p * 2.04) / dot(p, p) - .9;
-            v += pow(dot(p, p), .7) * .06;
-            col +=  vec3(v * 0.2+.4, 12.-s*2., .1 + v * 1.) * v * 0.00003;
-            s += .025;
-        }
-
-        
-        float grayscale = dot(col, vec3(0.21, 0.72, 0.07));
-        col = vec3(grayscale);
-
-        fragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
-
-        gl_FragColor = fragColor;
+    float s = 0.0, v = 0.0;
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.;
+    float time = (iTime-2.0)*58.0;
+    vec3 col = vec3(0);
+    vec3 init = vec3(tan(time * .0032)*.3, .35 - tan(time * .005)*.3, time * 0.0002);
+    for (int r = 0; r < 40; r++) 
+    {
+        vec3 p = init + s * vec3(uv, 0.05);
+        p.z = fract(p.z);
+        for (int i=0; i < 10; i++) p = abs(p * 2.04) / dot(p, p) - .9;
+        v += pow(dot(p, p), .7) * .06;
+        col +=  vec3(v * 0.2+.4, 12.-s*2., .1 + v * 1.) * v * 0.00003;
+        s += .025;
     }
+
+    float grayscale = dot(col, vec3(0.21, 0.72, 0.07));
+    col = vec3(grayscale);
+
+    fragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+
+    gl_FragColor = fragColor;
+}
+
 `;
+
+// Fragment shader for desktop
+const fsSourceDesktop = `
+precision mediump float;
+uniform vec2 iResolution;
+uniform float iTime;
+
+void main() {
+    vec2 fragCoord = gl_FragCoord.xy;
+    vec4 fragColor;
+
+    float s = 0.0, v = 0.0;
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.;
+    float time = (iTime-2.0)*58.0;
+    vec3 col = vec3(0);
+    vec3 init = vec3(tan(time * .0032)*.3, .35 - tan(time * .005)*.3, time * 0.0002);
+    for (int r = 0; r < 100; r++) 
+    {
+        vec3 p = init + s * vec3(uv, 0.05);
+        p.z = fract(p.z);
+        for (int i=0; i < 10; i++) p = abs(p * 2.04) / dot(p, p) - .9;
+        v += pow(dot(p, p), .7) * .06;
+        col +=  vec3(v * 0.2+.4, 12.-s*2., .1 + v * 1.) * v * 0.00003;
+        s += .025;
+    }
+
+    float grayscale = dot(col, vec3(0.21, 0.72, 0.07));
+    col = vec3(grayscale);
+
+    fragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+
+    gl_FragColor = fragColor;
+}
+`;
+
+// Detect if the user is on a mobile device
+const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
+// Choose the appropriate fragment shader source
+const fsSource = isMobile ? fsSourceMobile : fsSourceDesktop;
 
 
 
