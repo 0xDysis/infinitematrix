@@ -1,7 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Shadertoy Renderer</title>
+    <title>infinite matrix</title>
+        <style>
+            body, canvas {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+            }
+            #centerImage {
+                position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px; 
+  height: 300px; 
+  transform: translate(-50%, -50%); 
+  opacity: 80%;
+  z-index: 1;
+            }
+        </style>
+    </head>
     <style>
         body, canvas {
             margin: 0;
@@ -13,6 +32,7 @@
 </head>
 <body>
     <canvas id="glCanvas"></canvas>
+    <img id="centerImage" src="XXX copy.png" alt="Centered image">
     <script src="shader.js"></script>
 </body>
 </html>

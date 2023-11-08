@@ -21,7 +21,7 @@ const fsSource = `
         vec4 fragColor;
 
         float s = 0.0, v = 0.0;
-        vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.5;
+        vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.;
         float time = (iTime-2.0)*58.0;
         vec3 col = vec3(0);
         vec3 init = vec3(tan(time * .0032)*.3, .35 - tan(time * .005)*.3, time * 0.0002);
