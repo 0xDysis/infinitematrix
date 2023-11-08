@@ -14,35 +14,40 @@ const vsSource = `
 // Fragment shader for mobile
 const fsSourceMobile = `
 
-precision lowp float;
+precision mediump float;
 uniform vec2 iResolution;
 uniform float iTime;
 
-void main() {
-    vec2 fragCoord = gl_FragCoord.xy;
-    vec4 fragColor;
+vec3 palette( float t ) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.263,0.416,0.557);
 
-    float s = 0.0, v = 0.0;
-    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.;
-    float time = (iTime-2.0)*58.0;
-    vec3 col = vec3(0);
-    vec3 init = vec3(tan(time * .0032)*.3, .35 - tan(time * .005)*.3, time * 0.0002);
-    for (int r = 0; r < 35; r++) 
-    {
-        vec3 p = init + s * vec3(uv, 0.05);
-        p.z = fract(p.z);
-        for (int i=0; i < 9; i++) p = abs(p * 2.04) / dot(p, p) - .9;
-        v += pow(dot(p, p), .7) * .06;
-        col +=  vec3(v * 0.2+.4, 12.-s*2., .1 + v * 1.) * v * 0.00003;
-        s += .025;
+    return a + b*cos( 6.*(c*t+d) );
+}
+
+void main() {
+    vec2 uv = (gl_FragCoord.xy * 2.0 - iResolution.xy) / iResolution.y;
+    vec2 uv0 = uv;
+    vec3 finalColor = vec3(0.0);
+
+    for (float i = 0.0; i < 4.0; i++) {
+        uv = abs(uv * 1.2) - 0.5;
+
+        float d = length(uv) * exp(-length(uv0));
+
+        vec3 col = palette(length(uv0) + i*.9 + iTime*.5);
+
+        d = fract(sin(tan(d*8. + iTime)))/9.;
+        d = abs(d);
+
+        d = pow(0.01 / d, 1.1);
+
+        finalColor += col * fract(d);
     }
 
-    float grayscale = dot(col, vec3(0.21, 0.72, 0.07));
-    col = vec3(grayscale);
-
-    fragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
-
-    gl_FragColor = fragColor;
+    gl_FragColor = vec4(finalColor, 1.0);
 }
 
 `;
