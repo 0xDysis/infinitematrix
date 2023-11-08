@@ -12,7 +12,7 @@ const vsSource = `
 
 
 const fsSource = `
-    precision mediump float;
+    precision lowp float;
     uniform vec2 iResolution;
     uniform float iTime;
 
@@ -25,7 +25,7 @@ const fsSource = `
         float time = (iTime-2.0)*58.0;
         vec3 col = vec3(0);
         vec3 init = vec3(tan(time * .0032)*.3, .35 - tan(time * .005)*.3, time * 0.0002);
-        for (int r = 0; r < 100; r++) 
+        for (int r = 0; r < 50; r++) 
         {
             vec3 p = init + s * vec3(uv, 0.05);
             p.z = fract(p.z);
